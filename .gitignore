@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Data and training artifacts
+data/
+*.bin
+*.pt
+runs/
+.pytest_cache/

@@ -1,10 +1,17 @@
 [project]
 name = "distributedtraining"
 version = "0.1.0"
-description = "Add your description here"
+description = "Distributed LLM training from first principles: GPT baseline to DeepSeek-V3, with DP, FSDP, TP and PP"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "loguru",
+    "numpy",
+    "torch>=2.4",
+]
+
+[dependency-groups]
+dev = ["pytest"]
 
 [project.scripts]
 distributedtraining = "distributedtraining:main"
@@ -12,3 +19,7 @@ distributedtraining = "distributedtraining:main"
 [build-system]
 requires = ["uv_build>=0.12.20,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

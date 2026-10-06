@@ -28,11 +28,12 @@ def rope_cache(seq_len, d_head, base=10000.0, device=None):
 def apply_rope(x, cos, sin):
     """Rotates interleaved pairs (x[..., 2i], x[..., 2i+1]) of x: (B, H, T, d_head) by position."""
     B, H, T, d_head = x.shape
+    type_ = x.dtype
     # e^{i m theta} as a complex tensor, broadcast over batch and heads
     freqs = torch.view_as_complex(torch.stack((cos, sin), dim=-1))
     freqs = freqs.reshape(1, 1, freqs.shape[0], freqs.shape[-1])[:, :, :T, :]
-    x = torch.view_as_complex(x.reshape(B, H, T, d_head // 2, 2))
-    return torch.view_as_real(x * freqs).reshape(B, H, T, d_head)
+    x = torch.view_as_complex(x.float().reshape(B, H, T, d_head // 2, 2))
+    return torch.view_as_real(x * freqs).reshape(B, H, T, d_head).to(type_)
 
 
 class RMSNorm(nn.Module):
@@ -42,8 +43,8 @@ class RMSNorm(nn.Module):
         self.weight = nn.Parameter(torch.ones(d))
 
     def forward(self, x):
-        rms = torch.sqrt(torch.mean(x ** 2, -1) + self.eps)
-        return torch.divide(x, rms[:, :, None]) * self.weight
+        rms = torch.sqrt(torch.mean(x ** 2, -1,keepdims=True) + self.eps)
+        return torch.divide(x, rms) * self.weight
 
 
 class Attention(nn.Module):
